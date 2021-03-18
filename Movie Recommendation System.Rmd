@@ -1,0 +1,252 @@
+---
+title: "Movie Recommendation System"
+author: "Jared Thach"
+date: "3/11/2021"
+output: html_document
+---
+
+# Synopsis:
+
+# Table of Contents
+
+1. <a href='#Sec 1'>Importing Libraries and Data</a>
+2. <a href='#Sec 2'>Data Cleaning / Pre-Processing</a>
+3. <a href='#Sec 3'>Exploratory Data Analysis</a>
+    a. <a href='#Sec 3-1'>Most Commonly Filmed Genres</a>
+    b. <a href='#Sec 3-2'>Distribution of Ratings</a>
+    c. <a href='#Sec 3-3'>Top 10 Most Viewed Movies</a>
+4. <a href='#Sec 4'>Data Cleaning / Pre-Processing (cont'd.)</a>
+5. <a href='#Sec 5'>Building the Model</a>
+6. <a href='#Sec 6'>Evaluating Performance</a>
+7. <a href='#Sec 7'>Conclusion</a>
+
+# <a id='Sec 1'>Importing Libraries and Data</a>
+```{r, message=FALSE}
+# importing packages
+library(recommenderlab)
+library(ggplot2)
+library(data.table)
+library(reshape2)
+```
+
+```{r}
+# importing movie and rating data
+movies = read.csv('movies.csv', stringsAsFactors=FALSE)
+ratings = read.csv('ratings.csv')
+
+head(movies)
+head(ratings)
+
+summary(movies)
+summary(ratings)
+```
+*Source*: https://data-flair.training/blogs/data-science-r-movie-recommendation/
+
+# <a id='Sec 2'>Data Cleaning / Pre-Processing</a>
+
+In order to fit our model with our data, we must ensure all variables follow a numerial type. In this case, we must one hot encode our `genres` column in our `movie` dataset.
+```{r}
+unique_genres = c("Action", "Adventure", "Animation", "Children", "Comedy", "Crime","Documentary", "Drama", "Fantasy", "Film-Noir", "Horror", "Musical", "Mystery","Romance", "Sci-Fi", "Thriller", "War", "Western")
+
+# splitting each row's genres
+genre = as.data.frame(movies$genres, stringsAsFactors=FALSE)
+genre = strsplit(genre[,1], split='[|]')
+
+genreMatrix = data.frame(matrix(0, nrow(movies), length(unique_genres)))
+colnames(genreMatrix) = unique_genres
+
+# creating a one hot encoded data frame
+for (row in 1:nrow(genreMatrix)) {
+  row_genres = unlist(genre[row])
+  for (col in row_genres) {
+    genreMatrix[row, col] = 1
+  }
+}
+
+# removing last two columns because these are null
+genreMatrix = genreMatrix[,c(-19,-20)]
+head(genreMatrix)
+```
+
+```{r}
+# adding one hot encoded matrix to movies data frame
+movies = cbind(movies, genreMatrix)
+head(movies)
+```
+
+We also want to pre-process our `ratings` data frame by using `recommenderlabs` to convert it into a sparse matrix.
+```{r}
+ratingsMatrix = dcast(ratings, userId~movieId, value.var='rating', na.rm=FALSE)
+ratingsMatrix = as.matrix(ratingsMatrix[,-1])
+ratingsMatrix = as(ratingsMatrix, 'realRatingMatrix')
+ratingsMatrix
+```
+
+Using this new `realRatingMatrix` object, we can choose an item-based collaborative filtering recommendation model. We will view its parameters. Additionally, this model follows the general procedure of recommending movies that person A previously liked to person B who has similarly like movies. Therefore, we will also view a sample similarity matrix between the first 4 users as a quick visual aid.
+```{r}
+model = recommenderRegistry$get_entries(dataType='realRatingMatrix')
+# model parameters
+model$IBCF_realRatingMatrix$parameters
+
+# sample similarity matrix using the first four users 
+sampleSimilarityMatrix = similarity(ratingsMatrix[1:4,],
+                              method='cosine',
+                              which='users')
+as.matrix(sampleSimilarityMatrix)
+```
+
+As we can see, these four users have relatively high similarities between one another; all possible combinations of similarities are values $\geq$ 0.93.
+
+# <a id='Sec 3'>Exploratory Data Analysis</a>
+
+#### <a id='Sec 3-1'>Most Commonly Filmed Genres</a>
+```{r}
+# most commonly filmed genres
+temp = sort(colSums(movies[,c(-1,-2,-3)]), decreasing=TRUE)
+barplot(temp, 
+        las=3, 
+        cex.names=0.75,
+        ylab='Frequency',
+        main='Most Commonly Filmed Genres'
+)
+```
+
+It appears that the 3 most commonly filmed genres in this dataset are "Drama", "Comedy", and "Thriller." At the tail of the distribution, we see that "Animation", "Western", and "Film-Noir" genres are the 3 least commonly created.
+
+#### <a id='Sec 3-2'>Distribution of Ratings</a>
+```{r}
+# distribution of ratings
+hist(ratings$rating, 
+     breaks=10,
+     xlab='Rating',
+     main='Distribution of Ratings'
+)
+```
+
+As we can see, most ratings are concentrated between 3 and 5, with even higher frequencies for exact values of "3", "4", and "5" (rather than "3.5", "4.5", and etc.)
+
+#### <a id='Sec 3-3'>Top 10 Most Viewed Movies</a>
+```{r}
+# merging ratings and movies into a single data frame
+temp = colCounts(ratingsMatrix)
+temp = data.frame(movieId=names(temp),
+                  views=temp)
+temp$movieId = as.integer(as.character(temp$movieId))
+merged_df = merge(temp, movies, by='movieId', all.x=TRUE)
+
+# most viewed movies
+temp = merged_df[order(merged_df$views, decreasing=TRUE),c('movieId', 'title', 'views')]
+barplot(height=temp$views[1:10], 
+        names.arg=temp$title[1:10], 
+        las=2, 
+        cex.names=0.5,
+        ylab='Views',
+        main='Top 10 Most Viewed Movies')
+```
+
+Our top 10 most viewed in descending order movies are:
+
+- `r temp$title[1]`
+- `r temp$title[2]`
+- `r temp$title[3]`
+- `r temp$title[4]`
+- `r temp$title[5]`
+- `r temp$title[6]`
+- `r temp$title[7]`
+- `r temp$title[8]`
+- `r temp$title[9]`
+- `r temp$title[10]`
+
+# <a id='Sec 4'>Data Cleaning / Pre-Processing (cont'd.)</a>
+
+Before fitting our data into our user based collaborative filtering (UBCF) recommendation model, we must further scale, normalize, and/or binarize certain features.
+
+Firstly, we want to only **select movies with a large enough sample size** of ratings. We will use a threshold of n > 30 for all movies, as a minimum of 31 movies better ensures that there are no unusual results. Also, we want to only utilize users with more than 30 ratings, as this will further better ensure that there are no "bad" or unreliable reviewers who only review a few of their top or lowest movies.
+```{r}
+# selecting only movies with more than 50 ratings
+df = ratingsMatrix[rowCounts(ratingsMatrix) > 30, colCounts(ratingsMatrix) > 30]
+df
+```
+
+Secondly, rather than having a rating distribution in the range of [0,5], we prefer a normalized distribution centered around 0 with a measurable standard deviation. This normalization will automatically be performed upon fitting the data to our UBCF model with the parameter `normalize='center'`.
+```{r}
+par(mfrow=c(1,2))
+
+temp = rowMeans(df)
+# un-normalized distribution of ratings
+hist(temp, 
+     breaks=30,
+     xlab='Rating',
+     main='Un-normalized Ratings')
+
+# normalized distribution of ratings
+temp = rowMeans(normalize(df))
+hist(temp,
+     breaks=30,
+     xlab='Rating',
+     main='Normalized Ratings')
+```
+
+# <a id='Sec 5'>Building the Model</a>
+
+```{r}
+set.seed(99)
+
+# splitting into training and testing sets of 75% and 25%, respectively
+sample = sample.int(nrow(df), floor(0.75*nrow(df)), replace=FALSE)
+
+train = df[sample,]
+test = df[-sample,]
+
+# fitting UBCF model
+model = Recommender(data=train,
+                    method='UBCF',
+                    parameter=list(nn=25, method='pearson', normalize='center'))
+
+# viewing model parameters
+getModel(model)
+```
+
+Next, we will use our testing set to recommend/predict 10 movies our model believes the individual users will enjoy.
+```{r}
+# getting user id's to later view their rating profiles
+user_ids = seq(1,nrow(df))[-sample]
+movies_ratings = merge(x=ratings, y=movies, by='movieId', all.x=TRUE)[, c(1,2,3,5)]
+
+# predicting movies for the remaining users in our test set
+predictions = predict(object=model, newdata=test, n=10)
+predictions
+```
+
+Here, we will create a function to quickly and easily view the users' rating profile as well as their recommended movies.
+```{r}
+view_user = function(user) {
+  
+  # getting user's 10 recommended movies
+  recommended = predictions@itemLabels[predictions@items[[user]]]
+  
+  for (i in 1:10) {
+    recommended[i] = movies[movies$movieId == recommended[i],'title']
+  }
+  
+  # printing user profile
+  print(ratingsMatrix[user_ids[user]])
+  print(movies_ratings[movies_ratings$userId == user_ids[user],])
+  
+  return(recommended)
+}
+
+# viewing profile and recommended movies of user #1
+view_user(user=1)
+
+# viewing profile and recommended movies of user #8
+view_user(user=8)
+```
+
+# <a id='Sec 6'>Evaluating Performance</a>
+
+```{r}
+# evaluate()
+```
+
+# <a id='Sec 7'>Conclusion</a>
