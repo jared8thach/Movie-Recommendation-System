@@ -7,24 +7,41 @@ output: html_document
 
 # Synopsis:
 
-# Table of Contents
+#### Introduction and Objective
 
-1. <a href='#Sec 1'>Importing Libraries and Data</a>
-2. <a href='#Sec 2'>Data Cleaning / Pre-Processing</a>
-3. <a href='#Sec 3'>Exploratory Data Analysis</a>
+#### Conclusion
+ 
+#### Methods Used
+- Data Cleaning / Pre-Processing
+- Data Visualization
+- User-Based Collaberative Filtering
+
+#### Technologies
+- R Programming
+  - `recommenderlab`
+
+#### Contributors
+- Jared Thach - github/jared8thach
+
+# Table of Contents
+1) <a href='#Sec 1'>Importing Libraries and Data</a>
+2) <a href='#Sec 2'>Data Cleaning / Pre-Processing</a>
+3) <a href='#Sec 3'>Exploratory Data Analysis</a>
     a. <a href='#Sec 3-1'>Most Commonly Filmed Genres</a>
     b. <a href='#Sec 3-2'>Distribution of Ratings</a>
     c. <a href='#Sec 3-3'>Top 10 Most Viewed Movies</a>
-4. <a href='#Sec 4'>Data Cleaning / Pre-Processing (cont'd.)</a>
-5. <a href='#Sec 5'>Building the Model</a>
-6. <a href='#Sec 6'>Evaluating Performance</a>
-7. <a href='#Sec 7'>Conclusion</a>
+4) <a href='#Sec 4'>Data Cleaning / Pre-Processing (cont'd.)</a>
+5) <a href='#Sec 5'>Building the Model</a>
+6) <a href='#Sec 6'>Evaluating Performance</a>
+7) <a href='#Sec 7'>Conclusion</a>
 
-# <a id='Sec 1'>Importing Libraries and Data</a>
+***
+
+# 1) <a id='Sec 1'>Importing Libraries and Data</a>
 ```{r, message=FALSE}
 # importing packages
 library(recommenderlab)
-library(ggplot2)
+# library(ggplot2)
 library(data.table)
 library(reshape2)
 ```
@@ -42,7 +59,7 @@ summary(ratings)
 ```
 *Source*: https://data-flair.training/blogs/data-science-r-movie-recommendation/
 
-# <a id='Sec 2'>Data Cleaning / Pre-Processing</a>
+# 2) <a id='Sec 2'>Data Cleaning / Pre-Processing</a>
 
 In order to fit our model with our data, we must ensure all variables follow a numerial type. In this case, we must one hot encode our `genres` column in our `movie` dataset.
 ```{r}
@@ -97,7 +114,7 @@ as.matrix(sampleSimilarityMatrix)
 
 As we can see, these four users have relatively high similarities between one another; all possible combinations of similarities are values $\geq$ 0.93.
 
-# <a id='Sec 3'>Exploratory Data Analysis</a>
+# 3) <a id='Sec 3'>Exploratory Data Analysis</a>
 
 #### <a id='Sec 3-1'>Most Commonly Filmed Genres</a>
 ```{r}
@@ -157,7 +174,7 @@ Our top 10 most viewed in descending order movies are:
 - `r temp$title[9]`
 - `r temp$title[10]`
 
-# <a id='Sec 4'>Data Cleaning / Pre-Processing (cont'd.)</a>
+# 4) <a id='Sec 4'>Data Cleaning / Pre-Processing (cont'd.)</a>
 
 Before fitting our data into our user based collaborative filtering (UBCF) recommendation model, we must further scale, normalize, and/or binarize certain features.
 
@@ -187,8 +204,7 @@ hist(temp,
      main='Normalized Ratings')
 ```
 
-# <a id='Sec 5'>Building the Model</a>
-
+# 5) <a id='Sec 5'>Building the Model</a>
 ```{r}
 set.seed(99)
 
@@ -231,7 +247,7 @@ view_user = function(user) {
   
   # printing user profile
   print(ratingsMatrix[user_ids[user]])
-  print(movies_ratings[movies_ratings$userId == user_ids[user],])
+  print(head(movies_ratings[movies_ratings$userId == user_ids[user],]))
   
   return(recommended)
 }
@@ -239,14 +255,14 @@ view_user = function(user) {
 # viewing profile and recommended movies of user #1
 view_user(user=1)
 
-# viewing profile and recommended movies of user #8
-view_user(user=8)
+# viewing profile and recommended movies of user #2
+view_user(user=2)
 ```
 
-# <a id='Sec 6'>Evaluating Performance</a>
+# 6) <a id='Sec 6'>Evaluating Performance</a>
 
 ```{r}
 # evaluate()
 ```
 
-# <a id='Sec 7'>Conclusion</a>
+# 7) <a id='Sec 7'>Conclusion</a>

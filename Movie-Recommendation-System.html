@@ -381,6 +381,35 @@ summary {
 
 <div id="synopsis" class="section level1">
 <h1>Synopsis:</h1>
+<div id="introduction-and-objective" class="section level4">
+<h4>Introduction and Objective</h4>
+</div>
+<div id="conclusion" class="section level4">
+<h4>Conclusion</h4>
+</div>
+<div id="methods-used" class="section level4">
+<h4>Methods Used</h4>
+<ul>
+<li>Data Cleaning / Pre-Processing</li>
+<li>Data Visualization</li>
+<li>User-Based Collaberative Filtering</li>
+</ul>
+</div>
+<div id="technologies" class="section level4">
+<h4>Technologies</h4>
+<ul>
+<li>R Programming
+<ul>
+<li><code>recommenderlab</code></li>
+</ul></li>
+</ul>
+</div>
+<div id="contributors" class="section level4">
+<h4>Contributors</h4>
+<ul>
+<li>Jared Thach - github/jared8thach</li>
+</ul>
+</div>
 </div>
 <div id="table-of-contents" class="section level1">
 <h1>Table of Contents</h1>
@@ -398,12 +427,13 @@ summary {
 <li><a href="#Sec 6">Evaluating Performance</a></li>
 <li><a href="#Sec 7">Conclusion</a></li>
 </ol>
+<hr />
 </div>
 <div id="importing-libraries-and-data" class="section level1">
-<h1><a id="Sec 1">Importing Libraries and Data</a></h1>
+<h1>1) <a id="Sec 1">Importing Libraries and Data</a></h1>
 <pre class="r"><code># importing packages
 library(recommenderlab)
-library(ggplot2)
+# library(ggplot2)
 library(data.table)
 library(reshape2)</code></pre>
 <pre class="r"><code># importing movie and rating data
@@ -452,7 +482,7 @@ head(movies)</code></pre>
 <p><em>Source</em>: <a href="https://data-flair.training/blogs/data-science-r-movie-recommendation/" class="uri">https://data-flair.training/blogs/data-science-r-movie-recommendation/</a></p>
 </div>
 <div id="data-cleaning-pre-processing" class="section level1">
-<h1><a id="Sec 2">Data Cleaning / Pre-Processing</a></h1>
+<h1>2) <a id="Sec 2">Data Cleaning / Pre-Processing</a></h1>
 <p>In order to fit our model with our data, we must ensure all variables follow a numerial type. In this case, we must one hot encode our <code>genres</code> column in our <code>movie</code> dataset.</p>
 <pre class="r"><code>unique_genres = c(&quot;Action&quot;, &quot;Adventure&quot;, &quot;Animation&quot;, &quot;Children&quot;, &quot;Comedy&quot;, &quot;Crime&quot;,&quot;Documentary&quot;, &quot;Drama&quot;, &quot;Fantasy&quot;, &quot;Film-Noir&quot;, &quot;Horror&quot;, &quot;Musical&quot;, &quot;Mystery&quot;,&quot;Romance&quot;, &quot;Sci-Fi&quot;, &quot;Thriller&quot;, &quot;War&quot;, &quot;Western&quot;)
 
@@ -559,7 +589,7 @@ as.matrix(sampleSimilarityMatrix)</code></pre>
 <p>As we can see, these four users have relatively high similarities between one another; all possible combinations of similarities are values <span class="math inline">\(\geq\)</span> 0.93.</p>
 </div>
 <div id="exploratory-data-analysis" class="section level1">
-<h1><a id="Sec 3">Exploratory Data Analysis</a></h1>
+<h1>3) <a id="Sec 3">Exploratory Data Analysis</a></h1>
 <div id="most-commonly-filmed-genres" class="section level4">
 <h4><a id="Sec 3-1">Most Commonly Filmed Genres</a></h4>
 <pre class="r"><code># most commonly filmed genres
@@ -618,7 +648,7 @@ barplot(height=temp$views[1:10],
 </div>
 </div>
 <div id="data-cleaning-pre-processing-contd." class="section level1">
-<h1><a id="Sec 4">Data Cleaning / Pre-Processing (cont’d.)</a></h1>
+<h1>4) <a id="Sec 4">Data Cleaning / Pre-Processing (cont’d.)</a></h1>
 <p>Before fitting our data into our user based collaborative filtering (UBCF) recommendation model, we must further scale, normalize, and/or binarize certain features.</p>
 <p>Firstly, we want to only <strong>select movies with a large enough sample size</strong> of ratings. We will use a threshold of n &gt; 30 for all movies, as a minimum of 31 movies better ensures that there are no unusual results. Also, we want to only utilize users with more than 30 ratings, as this will further better ensure that there are no “bad” or unreliable reviewers who only review a few of their top or lowest movies.</p>
 <pre class="r"><code># selecting only movies with more than 50 ratings
@@ -644,7 +674,7 @@ hist(temp,
 <p><img src="data:image/png;base64,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" width="672" /></p>
 </div>
 <div id="building-the-model" class="section level1">
-<h1><a id="Sec 5">Building the Model</a></h1>
+<h1>5) <a id="Sec 5">Building the Model</a></h1>
 <pre class="r"><code>set.seed(99)
 
 # splitting into training and testing sets of 75% and 25%, respectively
@@ -711,7 +741,7 @@ predictions</code></pre>
   
   # printing user profile
   print(ratingsMatrix[user_ids[user]])
-  print(movies_ratings[movies_ratings$userId == user_ids[user],])
+  print(head(movies_ratings[movies_ratings$userId == user_ids[user],]))
   
   return(recommended)
 }
@@ -719,36 +749,13 @@ predictions</code></pre>
 # viewing profile and recommended movies of user #1
 view_user(user=1)</code></pre>
 <pre><code>## 1 x 10325 rating matrix of class &#39;realRatingMatrix&#39; with 29 ratings.
-##       movieId userId rating                                      title
-## 53          1      2      5                           Toy Story (1995)
-## 365         3      2      2                    Grumpier Old Men (1995)
-## 406         5      2      3         Father of the Bride Part II (1995)
-## 916        14      2      4                               Nixon (1995)
-## 1044       17      2      5               Sense and Sensibility (1995)
-## 1488       25      2      3                   Leaving Las Vegas (1995)
-## 1723       32      2      3  Twelve Monkeys (a.k.a. 12 Monkeys) (1995)
-## 2026       36      2      5                    Dead Man Walking (1995)
-## 2848       52      2      4                    Mighty Aphrodite (1995)
-## 2933       58      2      4          Postman, The (Postino, Il) (1994)
-## 3039       62      2      5                  Mr. Holland&#39;s Opus (1995)
-## 3305       79      2      4                          Juror, The (1996)
-## 3543       95      2      4                        Broken Arrow (1996)
-## 4187      112      2      3 Rumble in the Bronx (Hont faan kui) (1995)
-## 7808      260      2      4  Star Wars: Episode IV - A New Hope (1977)
-## 12231     376      2      4                     River Wild, The (1994)
-## 15112     494      2      4                  Executive Decision (1996)
-## 19240     608      2      5                               Fargo (1996)
-## 19554     637      2      3                          Sgt. Bilko (1996)
-## 19639     648      2      4                 Mission: Impossible (1996)
-## 19904     661      2      4           James and the Giant Peach (1996)
-## 20756     736      2      4                             Twister (1996)
-## 21484     780      2      4       Independence Day (a.k.a. ID4) (1996)
-## 21722     784      2      2                      Cable Guy, The (1996)
-## 21953     788      2      4                Nutty Professor, The (1996)
-## 22125     802      2      4                          Phenomenon (1996)
-## 22189     805      2      5                     Time to Kill, A (1996)
-## 26273    1073      2      4 Willy Wonka &amp; the Chocolate Factory (1971)
-## 35716    1356      2      4            Star Trek: First Contact (1996)</code></pre>
+##      movieId userId rating                              title
+## 53         1      2      5                   Toy Story (1995)
+## 365        3      2      2            Grumpier Old Men (1995)
+## 406        5      2      3 Father of the Bride Part II (1995)
+## 916       14      2      4                       Nixon (1995)
+## 1044      17      2      5       Sense and Sensibility (1995)
+## 1488      25      2      3           Leaving Las Vegas (1995)</code></pre>
 <pre><code>##  [1] &quot;Amadeus (1984)&quot;                            
 ##  [2] &quot;Caddyshack (1980)&quot;                         
 ##  [3] &quot;Jungle Book, The (1967)&quot;                   
@@ -759,110 +766,33 @@ view_user(user=1)</code></pre>
 ##  [8] &quot;Big Chill, The (1983)&quot;                     
 ##  [9] &quot;Ghostbusters (a.k.a. Ghost Busters) (1984)&quot;
 ## [10] &quot;Runaway Bride (1999)&quot;</code></pre>
-<pre class="r"><code># viewing profile and recommended movies of user #8
-view_user(user=8)</code></pre>
-<pre><code>## 1 x 10325 rating matrix of class &#39;realRatingMatrix&#39; with 41 ratings.
-##       movieId userId rating
-## 1456       24     27      2
-## 18115     590     27      4
-## 21947     788     27      4
-## 24382     933     27      5
-## 24404     934     27      3
-## 25244    1021     27      4
-## 26373    1077     27      4
-## 26392    1078     27      4
-## 26440    1079     27      5
-## 28062    1136     27      4
-## 28289    1175     27      5
-## 30311    1210     27      3
-## 31734    1234     27      4
-## 32721    1256     27      4
-## 33259    1265     27      5
-## 34045    1278     27      5
-## 34394    1288     27      5
-## 37068    1394     27      5
-## 41720    1719     27      5
-## 42160    1734     27      4
-## 45904    2021     27      4
-## 46266    2043     27      4
-## 47193    2100     27      3
-## 48416    2174     27      4
-## 49374    2289     27      5
-## 49615    2300     27      4
-## 49969    2324     27      5
-## 51157    2395     27      4
-## 51204    2396     27      3
-## 53889    2599     27      5
-## 54247    2628     27      3
-## 54761    2671     27      3
-## 54918    2683     27      2
-## 56815    2788     27      4
-## 56912    2791     27      5
-## 57093    2797     27      4
-## 57730    2858     27      5
-## 58547    2926     27      4
-## 59258    2973     27      4
-## 59728    2997     27      4
-## 60525    3072     27      4
-##                                                                  title
-## 1456                                                     Powder (1995)
-## 18115                                        Dances with Wolves (1990)
-## 21947                                      Nutty Professor, The (1996)
-## 24382                                          To Catch a Thief (1955)
-## 24404                                       Father of the Bride (1950)
-## 25244                                    Angels in the Outfield (1994)
-## 26373                                                   Sleeper (1973)
-## 26392                                                   Bananas (1971)
-## 26440                                      Fish Called Wanda, A (1988)
-## 28062                           Monty Python and the Holy Grail (1975)
-## 28289                                              Delicatessen (1991)
-## 30311                Star Wars: Episode VI - Return of the Jedi (1983)
-## 31734                                                Sting, The (1973)
-## 32721                                                 Duck Soup (1933)
-## 33259                                             Groundhog Day (1993)
-## 34045                                        Young Frankenstein (1974)
-## 34394                                        This Is Spinal Tap (1984)
-## 37068                                           Raising Arizona (1987)
-## 41720                                      Sweet Hereafter, The (1997)
-## 42160                          My Life in Pink (Ma vie en rose) (1997)
-## 45904                                                      Dune (1984)
-## 46266                        Darby O&#39;Gill and the Little People (1959)
-## 47193                                                    Splash (1984)
-## 48416                                               Beetlejuice (1988)
-## 49374                                               Player, The (1992)
-## 49615                                            Producers, The (1968)
-## 49969                      Life Is Beautiful (La Vita Ã¨ bella) (1997)
-## 51157                                                  Rushmore (1998)
-## 51204                                       Shakespeare in Love (1998)
-## 53889                                                  Election (1999)
-## 54247                 Star Wars: Episode I - The Phantom Menace (1999)
-## 54761                                              Notting Hill (1999)
-## 54918                     Austin Powers: The Spy Who Shagged Me (1999)
-## 56815 Monty Python&#39;s And Now for Something Completely Different (1971)
-## 56912                                                 Airplane! (1980)
-## 57093                                                       Big (1988)
-## 57730                                           American Beauty (1999)
-## 58547                                                 Hairspray (1988)
-## 59258                                   Crimes and Misdemeanors (1989)
-## 59728                                      Being John Malkovich (1999)
-## 60525                                                Moonstruck (1987)</code></pre>
-<pre><code>##  [1] &quot;Jerk, The (1979)&quot;                                      
-##  [2] &quot;Fletch (1985)&quot;                                         
-##  [3] &quot;Graduate, The (1967)&quot;                                  
-##  [4] &quot;Rocky Horror Picture Show, The (1975)&quot;                 
-##  [5] &quot;Untouchables, The (1987)&quot;                              
-##  [6] &quot;101 Dalmatians (One Hundred and One Dalmatians) (1961)&quot;
-##  [7] &quot;Citizen Kane (1941)&quot;                                   
-##  [8] &quot;American President, The (1995)&quot;                        
-##  [9] &quot;Copycat (1995)&quot;                                        
-## [10] &quot;Desperado (1995)&quot;</code></pre>
+<pre class="r"><code># viewing profile and recommended movies of user #2
+view_user(user=2)</code></pre>
+<pre><code>## 1 x 10325 rating matrix of class &#39;realRatingMatrix&#39; with 124 ratings.
+##      movieId userId rating                                                title
+## 1641      30      4      4 Shanghai Triad (Yao a yao yao dao waipo qiao) (1995)
+## 1780      32      4      5            Twelve Monkeys (a.k.a. 12 Monkeys) (1995)
+## 4150     111      4      4                                   Taxi Driver (1976)
+## 5020     154      4      4             Beauty of the Day (Belle de jour) (1967)
+## 6480     213      4      4       Burnt by the Sun (Utomlyonnye solntsem) (1994)
+## 8999     296      4      4                                  Pulp Fiction (1994)</code></pre>
+<pre><code>##  [1] &quot;Secret Garden, The (1993)&quot;                                                                     
+##  [2] &quot;Harry Potter and the Sorcerer&#39;s Stone (a.k.a. Harry Potter and the Philosopher&#39;s Stone) (2001)&quot;
+##  [3] &quot;Spirited Away (Sen to Chihiro no kamikakushi) (2001)&quot;                                          
+##  [4] &quot;Harry Potter and the Chamber of Secrets (2002)&quot;                                                
+##  [5] &quot;Pirates of the Caribbean: The Curse of the Black Pearl (2003)&quot;                                 
+##  [6] &quot;Harry Potter and the Prisoner of Azkaban (2004)&quot;                                               
+##  [7] &quot;Howl&#39;s Moving Castle (Hauru no ugoku shiro) (2004)&quot;                                            
+##  [8] &quot;Star Wars: Episode III - Revenge of the Sith (2005)&quot;                                           
+##  [9] &quot;Harry Potter and the Goblet of Fire (2005)&quot;                                                    
+## [10] &quot;Chronicles of Narnia: The Lion, the Witch and the Wardrobe, The (2005)&quot;</code></pre>
 </div>
 <div id="evaluating-performance" class="section level1">
-<h1><a id="Sec 6">Evaluating Performance</a></h1>
+<h1>6) <a id="Sec 6">Evaluating Performance</a></h1>
 <pre class="r"><code># evaluate()</code></pre>
 </div>
-<div id="conclusion" class="section level1">
-<h1><a id="Sec 7">Conclusion</a></h1>
+<div id="conclusion-1" class="section level1">
+<h1>7) <a id="Sec 7">Conclusion</a></h1>
 </div>
 
 
