@@ -2,7 +2,7 @@
 title: "Movie Recommendation System"
 author: "Jared Thach"
 date: "3/11/2021"
-output: html_document
+output: rmarkdown::github_document
 ---
 
 # Synopsis:
@@ -17,7 +17,7 @@ output: html_document
 - User-Based Collaberative Filtering
 
 #### Technologies
-- R Programming
+- R programming
   - `recommenderlab`
 
 #### Contributors
@@ -48,8 +48,8 @@ library(reshape2)
 
 ```{r}
 # importing movie and rating data
-movies = read.csv('movies.csv', stringsAsFactors=FALSE)
-ratings = read.csv('ratings.csv')
+movies = read.csv('data/movies.csv', stringsAsFactors=FALSE)
+ratings = read.csv('data/ratings.csv')
 
 head(movies)
 head(ratings)
