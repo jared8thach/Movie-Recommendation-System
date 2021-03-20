@@ -8,16 +8,13 @@
 #### Conclusion
 
 #### Methods Used
-
   - Data Cleaning / Pre-Processing
   - Data Visualization
   - User-Based Collaberative Filtering
 
 #### Technologies
-
   - R Programming
       - `recommenderlab`
 
 #### Contributors
-
   - Jared Thach - github/jared8thach
