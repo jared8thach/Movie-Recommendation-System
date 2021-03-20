@@ -1,2 +1,2 @@
 # Movie-Recommendation-System
- *location: `Movie-Recommendation-System.md`*
+ *project location: `Movie-Recommendation-System.md`*
